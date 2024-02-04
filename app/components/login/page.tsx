@@ -1,14 +1,31 @@
 "use client";
 import React, { useState, useEffect } from "react";
+
+/**
+ * Props for the LogoutButton component.
+ */
 interface LogoutButtonProps {
   onLogout: () => void;
 }
+
+/**
+ * LogoutButton component for rendering a logout button.
+ * @param {LogoutButtonProps} props - The component props.
+ */
 const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => (
-  <button className="" onClick={onLogout}>
+  <button
+    className="btn btn-primary bg-red-500 text-white py-2 rounded-md hover:bg-red-700 focus:outline-none"
+    onClick={onLogout}
+  >
     Logout
   </button>
 );
+
+/**
+ * Login component for handling user authentication.
+ */
 const Login = () => {
+  // State for handling user input and authentication status
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,6 +40,9 @@ const Login = () => {
   }>(null);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Handles the login process by making an API request.
+   */
   const handleLogin = async () => {
     try {
       const response = await fetch("https://dummyjson.com/auth/login", {
@@ -41,13 +61,9 @@ const Login = () => {
         setIsLoggedIn(true);
         setUserData(data); // Store user data
 
-        // Store the token in local storage
+        // Store the token, email, and first name in local storage
         localStorage.setItem("token", data.token);
-
-        //Store email in local storage
         localStorage.setItem("email", data.email);
-
-        //Store first name in local storage
         localStorage.setItem("firstName", data.firstName);
       } else {
         alert("Invalid username or password. Please try again.");
@@ -58,16 +74,22 @@ const Login = () => {
     }
   };
 
+  /**
+   * Handles the logout process by resetting states and clearing local storage.
+   */
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserData(null); // Clear user data
 
-    // Clear the token from local storage
+    // Clear the token, email, and first name from local storage
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     localStorage.removeItem("firstName");
   };
 
+  /**
+   * useEffect to check if the user is already logged in and has a valid token.
+   */
   useEffect(() => {
     // Check if there's a token in local storage
     const storedToken = localStorage.getItem("token");
@@ -97,11 +119,14 @@ const Login = () => {
     }
   }, []);
 
+  /**
+   * Render the Login component.
+   */
   return (
-    <div className=" items-center  ">
+    <div className="items-center">
       <div className="bg-white p-8 flex justify-around border border-gray-300 shadow-md rounded-md items-center">
         {loading && (
-          <div className="flex items-center justify-center h-full ">
+          <div className="flex items-center justify-center h-full">
             <p className="text-xl font-semibold text-gray-600 p-48">
               Loading...
             </p>
@@ -116,23 +141,11 @@ const Login = () => {
                     Welcome, {userData.username}!
                   </h1>
                   <p className="text-lg text-gray-800">ID: {userData.id}</p>
-                  <p className="text-lg text-gray-800">
-                    Email: {userData.email}
-                  </p>
-                  <p className="text-lg text-gray-800">
-                    First Name: {userData.firstName}
-                  </p>
-                  <p className="text-lg text-gray-800">
-                    Last Name: {userData.lastName}
-                  </p>
-                  <p className="text-lg text-gray-800">
-                    Gender: {userData.gender}
-                  </p>
                 </div>
                 <img
                   src={userData.image}
                   alt={`${userData.username}'s profile`}
-                  className="  object-contain"
+                  className="object-contain"
                 />
               </div>
               <div className="ml-48">
@@ -145,6 +158,7 @@ const Login = () => {
         )}
         {!loading && !isLoggedIn && (
           <>
+            {/* Login form */}
             <div className="mb-6 border border-gray-300 shadow-md rounded-md p-16">
               <h1 className="text-3xl font-bold mb-6">Login</h1>
               <div className="mb-4">
@@ -176,6 +190,7 @@ const Login = () => {
                 Login
               </button>
             </div>
+            {/* DummyJSON information */}
             <div className="ml-6 border border-gray-300 shadow-md rounded-md p-10">
               <h2 className="text-xl font-semibold mb-2">From DummyJSON</h2>
               <ul className="list-disc ml-6">
@@ -190,4 +205,5 @@ const Login = () => {
   );
 };
 
+// Export the component
 export default Login;

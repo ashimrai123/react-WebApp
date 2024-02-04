@@ -3,9 +3,17 @@ import React, { useEffect, useState } from "react";
 import Chart from "chart.js/auto";
 import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 
+/**
+ * Interface representing the structure of category data.
+ */
 interface categoryData {}
 
-const generateRandomColors = (count: number) => {
+/**
+ * Function to generate random colors for chart elements.
+ * @param {number} count - The number of colors to generate.
+ * @returns {string[]} An array of randomly generated colors in rgba format.
+ */
+const generateRandomColors = (count: number): string[] => {
   const colors = [];
   for (let i = 0; i < count; i++) {
     const rgba = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
@@ -16,6 +24,9 @@ const generateRandomColors = (count: number) => {
   return colors;
 };
 
+/**
+ * Dashboard component for rendering the main page.
+ */
 const Dashboard: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<number[]>([]);
@@ -47,7 +58,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchData();
-  }, []); // Empty dependency array to run only once during component mount
+  }, []);
 
   const [firstName, setFirstName] = useState("");
 
@@ -59,8 +70,10 @@ const Dashboard: React.FC = () => {
     }
   }, []);
 
+  // Render the component
   return (
     <>
+      {/* Hero section */}
       <section className="hero bg-gradient-to-r from-blue-500 to-purple-500 text-white py-16 mb-10">
         <div className="container mx-auto text-center">
           {!firstName && (
@@ -79,6 +92,7 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
       </section>
+      {/* Main content */}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">
           Product Distribution by Category
@@ -90,6 +104,7 @@ const Dashboard: React.FC = () => {
           />
         </div>
       </div>
+      {/* Footer */}
       <footer className="mt-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-8">
         <div className="container mx-auto flex justify-center items-center">
           <div className="flex space-x-4">
@@ -124,6 +139,9 @@ const Dashboard: React.FC = () => {
   );
 };
 
+/**
+ * ChartRenderer component for rendering a pie chart.
+ */
 const ChartRenderer: React.FC<{
   categories: string[];
   categoryCounts: number[];
@@ -167,4 +185,5 @@ const ChartRenderer: React.FC<{
   return <canvas id="pieChart" width="400" height="400"></canvas>;
 };
 
+// Export the component
 export default Dashboard;

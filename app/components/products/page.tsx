@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+/**
+ * Interface representing the structure of a product.
+ */
 interface Product {
   id: number;
   title: string;
@@ -13,11 +16,18 @@ interface Product {
   category: string;
 }
 
-// Define the ApiResponse type because it contains User[]
+/**
+ * Interface representing the structure of the API response containing products.
+ */
 interface ApiResponse {
   products: Product[];
 }
+
+/**
+ * React component for rendering a page that displays products.
+ */
 const ProductsPage = () => {
+  // State variables for managing products and categories
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
   const [products, setProducts] = useState<Product[]>([]);
@@ -25,6 +35,9 @@ const ProductsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
+  /**
+   * Fetches all products from the API and sets the state.
+   */
   useEffect(() => {
     const fetchProducts = async () => {
       const res = await fetch("https://dummyjson.com/products");
@@ -57,6 +70,9 @@ const ProductsPage = () => {
     fetchCategories();
   }, []);
 
+  /**
+   * Fetches products based on the selected category and updates the state.
+   */
   useEffect(() => {
     if (selectedCategory) {
       const fetchProductsByCategory = async () => {
@@ -73,9 +89,14 @@ const ProductsPage = () => {
     }
   }, [selectedCategory, products]);
 
+  // Calculate total number of products and pages
   const totalProducts = filteredProducts.length;
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
+  /**
+   * Generates an array of page numbers for pagination.
+   * @returns {JSX.Element[]} An array of JSX elements representing page numbers.
+   */
   const getPageNumbers = () => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -99,12 +120,18 @@ const ProductsPage = () => {
     return pageNumbers;
   };
 
+  /**
+   * Filters products based on the selected category.
+   * @param {string | null} category - The selected category.
+   */
   const filterProductsByCategory = (category: string | null) => {
     setSelectedCategory(category);
   };
 
+  // Render the component
   return (
     <div className="container mx-auto mt-8">
+      {/* Category selection dropdown */}
       <div className="flex justify-center mb-4 items-baseline">
         <label className="mr-2">Select Category:</label>
         <select
@@ -120,6 +147,7 @@ const ProductsPage = () => {
           ))}
         </select>
       </div>
+      {/* Product grid */}
       <div className="grid grid-cols-3 gap-4 mx-20">
         {filteredProducts
           .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
@@ -143,9 +171,11 @@ const ProductsPage = () => {
             </div>
           ))}
       </div>
+      {/* Pagination */}
       <div className="flex justify-center my-5">{getPageNumbers()}</div>
     </div>
   );
 };
 
+// Export the component
 export default ProductsPage;
