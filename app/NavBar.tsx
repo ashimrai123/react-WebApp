@@ -9,7 +9,7 @@ export const NavBar = () => {
   const currentPath = usePathname();
   const links = [
     { label: "Dashboard", href: "/" },
-    { label: "Products", href: "/products" },
+    { label: "Products", href: "/components/products" },
   ];
 
   return (

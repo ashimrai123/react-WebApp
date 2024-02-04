@@ -13,7 +13,7 @@ interface ApiResponse {
 }
 
 const UsersPage = async () => {
-  const res = await fetch("https://dummyjson.com/users", { cache: "no-store" });
+  const res = await fetch("https://dummyjson.com/users");
   const userApiResponse: ApiResponse = await res.json();
   const users: User[] = userApiResponse.users.map((user) => {
     return { id: user.id, firstName: user.firstName, email: user.email };
