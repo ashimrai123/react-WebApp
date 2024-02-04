@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button } from "@radix-ui/themes";
+// import { Button } from "@radix-ui/themes";
 
 interface Product {
   id: number;
@@ -11,17 +11,20 @@ interface Product {
   stock: number;
   thumbnail: string;
   images: string[];
+  category: string;
 }
 
 // Define the ApiResponse type because it contains User[]
 interface ApiResponse {
   products: Product[];
 }
-
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(12);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -37,64 +40,106 @@ const ProductsPage = () => {
           stock: product.stock,
           thumbnail: product.thumbnail,
           images: product.images,
+          category: product.category,
         })
       );
 
       setProducts(allProducts);
+      setFilteredProducts(allProducts);
+    };
+
+    const fetchCategories = async () => {
+      const res = await fetch("https://dummyjson.com/products/categories");
+      const categoryData = await res.json();
+      setCategories(categoryData);
     };
 
     fetchProducts();
+    fetchCategories();
   }, []);
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const visibleProducts = products.slice(startIndex, endIndex);
+  useEffect(() => {
+    if (selectedCategory) {
+      const fetchProductsByCategory = async () => {
+        const res = await fetch(
+          `https://dummyjson.com/products/category/${selectedCategory}`
+        );
+        const productData = await res.json();
+        setFilteredProducts(productData.products);
+      };
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
+      fetchProductsByCategory();
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [selectedCategory, products]);
+
+  const totalProducts = filteredProducts.length;
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          className={`btn btn-primary mx-1 ${
+            i === currentPage ? "bg-yellow-600 text-white" : ""
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
   };
 
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  const filterProductsByCategory = (category: string | null) => {
+    setSelectedCategory(category);
   };
 
   return (
     <div className="container mx-auto mt-8">
-      <Button className="mb-4">Product</Button>
-      {visibleProducts.map((product) => (
-        <div key={product.id} className="bg-white p-4 shadow-md mt-4 flex">
-          <div className="w-1/2 pr-4">
-            <h2 className="text-xl font-bold mb-2">{product.title}</h2>
-            <p className="text-gray-600 mb-4">{product.description}</p>
-            <p className="text-gray-800 font-semibold mb-2">
-              Price: ${product.price}
-            </p>
-            <p className="text-gray-800 mb-2">Rating: {product.rating}</p>
-            <p className="text-gray-800 mb-2">Stock: {product.stock}</p>
-          </div>
-          <img
-            src={product.thumbnail}
-            alt={`${product.title} - Thumbnail`}
-            className="w-1/2 h-auto"
-          />
-        </div>
-      ))}
-      <div className="flex justify-between mt-4">
-        <Button
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+      <div className="flex justify-center mb-4">
+        <label className="mr-2">Select Category:</label>
+        <select
+          onChange={(e) => filterProductsByCategory(e.target.value)}
+          value={selectedCategory || ""}
+          className="p-2 border border-gray-300"
         >
-          Previous Page
-        </Button>
-        <Button
-          onClick={handleNextPage}
-          disabled={endIndex >= products.length}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Next Page
-        </Button>
+          <option value="">All Categories</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
       </div>
+      <div className="grid grid-cols-3 gap-4 mx-20">
+        {filteredProducts
+          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+          .map((product) => (
+            <div
+              key={product.id}
+              className="bg-white p-2 shadow-md h-full transform hover:scale-105 transition-transform border border-gray-300 hover:border-blue-500"
+            >
+              <img
+                src={product.thumbnail}
+                alt={`${product.title} - Thumbnail`}
+                className="w-full h-40 object-contain mb-2"
+              />
+              <h2 className="text-lg font-bold mb-1">{product.title}</h2>
+              <p className="text-gray-600 mb-2">{product.description}</p>
+              <p className="text-gray-800 font-semibold mb-1">
+                Price: ${product.price}
+              </p>
+              <p className="text-gray-800 mb-1">Rating: {product.rating}</p>
+              <p className="text-gray-800 mb-1">Stock: {product.stock}</p>
+            </div>
+          ))}
+      </div>
+      <div className="flex justify-center my-5">{getPageNumbers()}</div>
     </div>
   );
 };
