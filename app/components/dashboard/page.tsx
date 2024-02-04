@@ -64,8 +64,8 @@ const Dashboard = () => {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: "left", // Set legend position to left
-            align: "start", // Align the legend to the start (covers the whole width)
+            position: "left",
+            align: "start",
           },
         },
       },
