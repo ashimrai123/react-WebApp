@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Chart from "chart.js/auto";
+import { FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 
 interface categoryData {}
 
@@ -15,77 +16,155 @@ const generateRandomColors = (count: number) => {
   return colors;
 };
 
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch categories and their counts
-      const res = await fetch("https://dummyjson.com/products/categories");
-      const categoryData = await res.json();
+      try {
+        // Fetch categories and their counts
+        const res = await fetch("https://dummyjson.com/products/categories");
+        const categoryData = await res.json();
 
-      setCategories(categoryData);
+        // Fetch product count per category
+        const countData = await Promise.all(
+          categoryData.map(async (category: categoryData) => {
+            const countRes = await fetch(
+              `https://dummyjson.com/products/category/${category}`
+            );
+            const countJson = await countRes.json();
+            return countJson.total;
+          })
+        );
 
-      // Fetch product count per category
-      const countData = await Promise.all(
-        categoryData.map(async (category: categoryData) => {
-          const countRes = await fetch(
-            `https://dummyjson.com/products/category/${category}`
-          );
-          const countJson = await countRes.json();
-          return countJson.total;
-        })
-      );
-
-      setCategoryCounts(countData);
+        // Set states after both sets of data are received
+        setCategories(categoryData);
+        setCategoryCounts(countData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
     fetchData();
+  }, []); // Empty dependency array to run only once during component mount
+
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    // Check local storage for firstName
+    const storedFirstName = localStorage.getItem("firstName");
+    if (storedFirstName) {
+      setFirstName(storedFirstName);
+    }
   }, []);
 
-  // Use Chart.js to create a pie chart
+  return (
+    <>
+      <section className="hero bg-gradient-to-r from-blue-500 to-purple-500 text-white py-16 mb-10">
+        <div className="container mx-auto text-center">
+          {!firstName && (
+            <h1 className="text-4xl lg:text-6xl font-bold mb-4 hover:text-indigo-300 transition-colors">
+              Welcome to Ash Store
+            </h1>
+          )}
+          {firstName && (
+            <h1 className="text-4xl lg:text-6xl font-bold mb-4 hover:text-purple-300 transition-colors">
+              Hello, {firstName}!
+            </h1>
+          )}
+
+          <p className="text-lg lg:text-xl">
+            Explore our curated collection of products for every need.
+          </p>
+        </div>
+      </section>
+      <div className="container mx-auto mt-8">
+        <h2 className="text-2xl font-bold mb-4">
+          Product Distribution by Category
+        </h2>
+        <div className="flex justify-center">
+          <ChartRenderer
+            categories={categories}
+            categoryCounts={categoryCounts}
+          />
+        </div>
+      </div>
+      <footer className="mt-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-8">
+        <div className="container mx-auto flex justify-center items-center">
+          <div className="flex space-x-4">
+            <a
+              href="https://github.com/ashimrai123"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-2xl"
+            >
+              <FaGithub />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/ashim-rai-a90857198/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-2xl"
+            >
+              <FaLinkedin />
+            </a>
+            <a
+              href="https://www.instagram.com/ashim_raibs/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-2xl"
+            >
+              <FaInstagram />
+            </a>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+};
+
+const ChartRenderer: React.FC<{
+  categories: string[];
+  categoryCounts: number[];
+}> = ({ categories, categoryCounts }) => {
+  const randomColors = generateRandomColors(categories.length);
+
   useEffect(() => {
     const ctx = document.getElementById("pieChart") as HTMLCanvasElement;
-    const myPieChart = new Chart(ctx, {
-      type: "pie",
-      data: {
-        labels: categories,
-        datasets: [
-          {
-            data: categoryCounts,
-            backgroundColor: generateRandomColors(categories.length),
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "left",
-            align: "start",
+
+    if (ctx) {
+      const myPieChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: categories,
+          datasets: [
+            {
+              data: categoryCounts,
+              backgroundColor: randomColors,
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "left",
+              align: "start",
+            },
           },
         },
-      },
-    });
+      });
 
-    return () => {
-      myPieChart.destroy();
-    };
-  }, [categories, categoryCounts]);
+      return () => {
+        myPieChart.destroy();
+      };
+    }
+  }, [categories, categoryCounts, randomColors]);
 
-  return (
-    <div className="container mx-auto mt-8">
-      <h2 className="text-2xl font-bold mb-4">
-        Product Distribution by Category
-      </h2>
-      <div className="flex justify-center">
-        <canvas id="pieChart" width="400" height="400"></canvas>
-      </div>
-    </div>
-  );
+  return <canvas id="pieChart" width="400" height="400"></canvas>;
 };
 
 export default Dashboard;

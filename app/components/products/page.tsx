@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-// import { Button } from "@radix-ui/themes";
 
 interface Product {
   id: number;
@@ -83,9 +82,14 @@ const ProductsPage = () => {
       pageNumbers.push(
         <button
           key={i}
-          onClick={() => setCurrentPage(i)}
-          className={`btn btn-primary mx-1 ${
-            i === currentPage ? "bg-yellow-600 text-white" : ""
+          onClick={() => {
+            setCurrentPage(i);
+            window.scrollTo(0, 0); // Scroll to the top of the page
+          }}
+          className={`btn mx-1 ${
+            i === currentPage
+              ? "bg-blue-600 text-white"
+              : "bg-gray-300 text-black"
           }`}
         >
           {i}
@@ -101,7 +105,7 @@ const ProductsPage = () => {
 
   return (
     <div className="container mx-auto mt-8">
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-4 items-baseline">
         <label className="mr-2">Select Category:</label>
         <select
           onChange={(e) => filterProductsByCategory(e.target.value)}

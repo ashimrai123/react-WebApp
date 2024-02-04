@@ -46,6 +46,9 @@ const Login = () => {
 
         //Store email in local storage
         localStorage.setItem("email", data.email);
+
+        //Store first name in local storage
+        localStorage.setItem("firstName", data.firstName);
       } else {
         alert("Invalid username or password. Please try again.");
       }
@@ -62,6 +65,7 @@ const Login = () => {
     // Clear the token from local storage
     localStorage.removeItem("token");
     localStorage.removeItem("email");
+    localStorage.removeItem("firstName");
   };
 
   useEffect(() => {
