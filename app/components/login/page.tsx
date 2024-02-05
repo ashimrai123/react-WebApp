@@ -13,12 +13,7 @@ interface LogoutButtonProps {
  * @param {LogoutButtonProps} props - The component props.
  */
 const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => (
-  <button
-    className="btn btn-primary bg-red-500 text-white py-2 rounded-md hover:bg-red-700 focus:outline-none"
-    onClick={onLogout}
-  >
-    Logout
-  </button>
+  <button onClick={onLogout}>Logout</button>
 );
 
 /**
@@ -141,6 +136,18 @@ const Login = () => {
                     Welcome, {userData.username}!
                   </h1>
                   <p className="text-lg text-gray-800">ID: {userData.id}</p>
+                  <p className="text-lg text-gray-800">
+                    Email: {userData.email}
+                  </p>
+                  <p className="text-lg text-gray-800">
+                    First Name: {userData.firstName}
+                  </p>
+                  <p className="text-lg text-gray-800">
+                    Last Name: {userData.lastName}
+                  </p>
+                  <p className="text-lg text-gray-800">
+                    Gender: {userData.gender}
+                  </p>
                 </div>
                 <img
                   src={userData.image}
