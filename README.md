@@ -2,6 +2,11 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Live Demo
+
+Check out the live demo of the application: [React Web Store App](https://main--ash-store.netlify.app/)
+
+
 ## Getting Started
 
 1. **Clone the repository:**
